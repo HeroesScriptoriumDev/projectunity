@@ -1,0 +1,30 @@
+name: Build APK
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Arrange project files
+        run: |
+          mkdir -p src/main/java/app/projectunity src/main/res/drawable src/main/assets
+          mv MainActivity.java src/main/java/app/projectunity/
+          mv AndroidManifest.xml src/main/
+          mv ic_launcher.xml src/main/res/drawable/
+          mv index.html src/main/assets/
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Build debug APK
+        run: gradle assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ProjectUnity-apk
+          path: build/outputs/apk/debug/*.apk
